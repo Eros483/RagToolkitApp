@@ -28,12 +28,18 @@
 3. Run `rag_gui.exe`.
 ---
 ### Dependencies
--llama-cpp-python 
--PySide6 
+-llama-cpp-python
+
+-PySide6
+
 -faiss-cpu 
--numpy 
+
+-numpy
+
 -pymupdf 
--sentence-transformers 
+
+-sentence-transformers
+
 -scikit-learn 
 
 ---
