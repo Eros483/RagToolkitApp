@@ -1,0 +1,8 @@
+pymupdf
+llama-cpp-python
+sentence-transformers
+faiss-cpu
+numpy
+scikit-learn
+pyside6
+pyinstaller

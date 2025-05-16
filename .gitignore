@@ -1,0 +1,9 @@
+# Ignore builds and executables
+build/
+dist/
+Releases/
+*.exe
+
+# Ignore model files
+models/*.gguf
+*.gguf
