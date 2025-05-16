@@ -5,8 +5,22 @@ import faiss
 import numpy as np
 from PySide6.QtCore import QRunnable, Slot, Signal, QObject
 import traceback
+import sys
+import os
 
-model_path="D:\\personalCode\\ragAgentFitness\\models\\Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf"
+if getattr(sys, 'frozen', False):
+    # Running as a bundled exe
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    # Running as a .py file
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+model_path = os.path.join(BASE_DIR, "models", "Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf")
+
+if not os.path.exists(model_path):
+    raise ValueError(f"Model path does not exist: {model_path}")
+
+
 llm=llama_cpp.Llama(model_path=model_path, chat_format="llama-2", n_ctx=8192, n_gpu_layers=-1)
 
 index=None
