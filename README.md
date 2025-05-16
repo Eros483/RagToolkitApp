@@ -22,8 +22,8 @@
 - Python 3.10 (if running from source)
 
 ### Running the Executable
-
-1. Download the `.exe` from the [Releases](#) section.
+1. Clone the repository
+1. Download the `.exe` from the [Releases](#) section, in the same directory as the clone.
 2. Run ``python download_model.py`` on your terminal from the same directory at which the .exe was installed
 3. Run `rag_gui.exe`.
 ---
