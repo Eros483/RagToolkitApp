@@ -26,6 +26,8 @@
 1. Download the `.exe` from the [Releases](#) section, in the same directory as the clone.
 2. Run ``python download_model.py`` on your terminal from the same directory at which the .exe was installed
 3. Run `rag_gui.exe`.
+
+   note: Created with CUDA support on LLAMA-CPP. Recreate executable by cloning repository, disabling cuda, and recompiling .exe with `pyinstaller --onefile --windowed rag_gui.py`
 ---
 ### Dependencies
 -llama-cpp-python
