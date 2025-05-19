@@ -112,15 +112,20 @@ def process_files(filepaths: list[str])-> None:
     else:
         raise ValueError('No text extracted')
     
-def ask_model(question: str)->str:
+def ask_model(question: str, history: list[tuple[str, str]])->str:
     '''
-    input: question as a string
+    input: question as a string, and history of previous questions and answers
     output: answer as a string
     '''
     context="\n\n".join(search_chunks(question))
 
+    chat_history=""
+    for q,a in history:
+        chat_history+="Q: "+q+"\nA: "+a+"\n\n"
+
     final_prompt=f"""<|im_start|>system
-    You are a helpful assistant. If the answer is not present in the context, print "Insufficient context" and nothing else. Structure your response in markdown, using bullet points or headings if appropriate. Ensure that if there is no relevant information, you provide "Insufficient context" and nothing else at all. <|im_end|>
+    You are a helpful assistant in a document Q&A app. If the answer is not present in the context, print "Insufficient context" and nothing else. Structure your response in markdown, using bullet points or headings if appropriate. Ensure that if there is no relevant information, you provide "Insufficient context" and nothing else at all. <|im_end|>
+    {chat_history}
     <|im_start|>user
     Use the following context to answer the question.
 
@@ -148,13 +153,14 @@ def ask_model(question: str)->str:
 class WorkerSignals(QObject):
     finished=Signal()
     error=Signal(str)
-    result=Signal(str)
+    result=Signal(object)
 
 class RAGWorker(QRunnable):
-    def __init__(self, filepaths, question=None):
+    def __init__(self, filepaths, question=None, history=None):
         super().__init__()
         self.filepaths=filepaths
         self.question=question
+        self.history=history or []
         self.signals=WorkerSignals()
     
     @Slot()
@@ -162,8 +168,9 @@ class RAGWorker(QRunnable):
         try:
             process_files(self.filepaths)
             if self.question:
-                result=ask_model(self.question)
-                self.signals.result.emit(result)
+                result=ask_model(self.question, self.history)
+                self.history.append((self.question, result))
+                self.signals.result.emit((result, self.history))
         
         except Exception as e:
             tb=traceback.format_exc()
