@@ -5,6 +5,8 @@ from PySide6.QtWidgets import(
 )
 
 from PySide6.QtCore import Qt, QThreadPool
+from PySide6.QtGui import QTextOption
+
 from rag_backend import RAGWorker
 
 class ChatBubble(QTextBrowser):
@@ -12,6 +14,9 @@ class ChatBubble(QTextBrowser):
         super().__init__()
         self.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.setWordWrapMode(QTextOption.WrapMode.WordWrap)
+
+        line_height=self.fontMetrics().height()
 
         if sender=="user":
             self.setStyleSheet("""
@@ -20,8 +25,13 @@ class ChatBubble(QTextBrowser):
                     color:white;
                     border-radius:10px;
                     padding 8px;
+                    border:none;
                 }
             """)
+            self.setMinimumHeight(int(line_height*1.5))
+            self.setMaximumHeight(int(line_height*3.5))
+            self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
         else:
             self.setStyleSheet("""
                 QTextBrowser{
@@ -29,19 +39,22 @@ class ChatBubble(QTextBrowser):
                     color:#dcdcdc;
                     border-radius:10px;
                     padding:8px;
+                    border: none;
                 }
             """)
+            self.setMinimumHeight(int(line_height * 3))
+            self.setMaximumHeight(16777215)
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
         self.setText(message)
-        self.setMaximumWidth(500)
-        self.setMinimumWidth(200)
 
-class RAGApp(QWidget):
+class RAGChatWidget(QWidget):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Rag Chat Assistant")
-        self.setMinimumSize(700, 600)
+        self.setMinimumSize(900, 700)
         self.conversation_history=[]
 
         self.threadpool=QThreadPool()
@@ -50,7 +63,9 @@ class RAGApp(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        main_layout=QVBoxLayout()
+        outer_layout=QHBoxLayout()
+
+        main_chat_area_layout=QVBoxLayout()
 
         file_layout=QHBoxLayout()
         self.file_button=QPushButton("Select PDF/JSON Files")
@@ -61,7 +76,7 @@ class RAGApp(QWidget):
         self.run_button.clicked.connect(self.run_rag)
         file_layout.addWidget(self.run_button)
 
-        main_layout.addLayout(file_layout)
+        main_chat_area_layout.addLayout(file_layout)
 
         self.chat_scroll=QScrollArea()
         self.chat_scroll.setWidgetResizable(True)
@@ -71,7 +86,7 @@ class RAGApp(QWidget):
         self.chat_scroll.setWidget(self.chat_container)
         self.chat_scroll.setStyleSheet("background-color: #1e1e1e;")
 
-        main_layout.addWidget(self.chat_scroll)
+        main_chat_area_layout.addWidget(self.chat_scroll)
 
         # Input area
         input_layout=QHBoxLayout()
@@ -83,8 +98,23 @@ class RAGApp(QWidget):
         self.ask_button.clicked.connect(self.run_rag)
         input_layout.addWidget(self.ask_button)
 
-        main_layout.addLayout(input_layout)
-        self.setLayout(main_layout)
+        main_chat_area_layout.addLayout(input_layout)
+
+        outer_layout.addLayout(main_chat_area_layout, 4)
+
+        right_side_panel_widget=QWidget()
+        right_side_panel_layout=QVBoxLayout(right_side_panel_widget)
+        right_side_panel_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        right_side_panel_widget.setStyleSheet("background-color: #864879;")
+
+        self.reset_button=QPushButton("Reset Chat")
+        self.reset_button.clicked.connect(self.reset_chat)
+        right_side_panel_layout.addWidget(self.reset_button)
+        right_side_panel_layout.addStretch(1)
+        
+        outer_layout.addWidget(right_side_panel_widget, 1)
+        
+        self.setLayout(outer_layout)
 
     def pick_file(self):
         files, _=QFileDialog.getOpenFileNames(self, "select Files", "", "PDF Files (*.pdf);;JSON Files (*.json)")
@@ -94,7 +124,19 @@ class RAGApp(QWidget):
     
     def add_message(self, text, sender):
         bubble=ChatBubble(text, sender)
-        self.chat_layout.addWidget(bubble)
+        h_layout=QHBoxLayout()
+
+        if sender=="user":   
+            h_layout.addStretch(1)
+            h_layout.addWidget(bubble)
+            h_layout.addStretch(0.2)
+        
+        else:
+            h_layout.addStretch(0.2)
+            h_layout.addWidget(bubble)
+            h_layout.addStretch(1)
+
+        self.chat_layout.addLayout(h_layout)
         self.chat_layout.addSpacing(5)
         self.chat_scroll.verticalScrollBar().setValue(self.chat_scroll.verticalScrollBar().maximum())
 
@@ -108,6 +150,7 @@ class RAGApp(QWidget):
         question=self.query_input.text().strip()
         if not question:
             self.add_message("Please enter a message.", "assistant")
+            return
 
         if not self.selected_files:
             self.add_message("Please select a PDF or a JSON file.", "assistant")
@@ -137,36 +180,23 @@ class RAGApp(QWidget):
         self.file_button.setEnabled(True)
         self.done_processing()
 
+    def reset_chat(self):
+        while self.chat_layout.count():
+            item=self.chat_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyleSheet("""
-        QWidget{
-            font-family:Arial;
-            font-size:14px;
-            color:#fff;
-            background-color:#121212;
-        }
+            elif item.layout():
+                self.clear_layout(item.layout())
 
-        QPushButton{
-            background-color:#2e2e2e;
-            color:white;
-            border:1px solid #444;
-            padding:6px;
-        }
+        self.conversation_history=[]
 
-        QPushButton:hover{
-            background-color:#3a3a3a;
-        }
+    def clear_layout(self, layout):
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
+                elif item.layout():
+                    self.clear_layout(item.layout())
 
-        QLineEdit{
-            background-color:#1e1e1e;
-            border:1px solid #444;
-            padding:6px;
-            color:white;
-        }
-    """)
-
-    window=RAGApp()
-    window.show()
-    sys.exit(app.exec_())
