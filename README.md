@@ -52,6 +52,6 @@
 - with respect to installing llama-cpp for use in conda environments, follow the following steps for *non cuda-support builds*:
     1. Install latest Visual Studio Build Tools (2019 or 2022)
     2. Activate your conda environment
-    3. run `call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"`
+    3. run `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"`
     4. verify installations with `where cl` and `where cmake`
     5. proceed with `pip install -r requirements.txt`
