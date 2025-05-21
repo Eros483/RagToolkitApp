@@ -7,7 +7,8 @@ from PySide6.QtWidgets import(
 from PySide6.QtCore import Qt, QThreadPool
 from PySide6.QtGui import QTextOption
 
-from rag_backend import RAGWorker
+from evaluation_backend import EvaluationWorker, json_path as default_json_path
+import os
 
 class ChatBubble(QTextBrowser):
     def __init__(self, message, sender="user"):
@@ -49,34 +50,49 @@ class ChatBubble(QTextBrowser):
 
         self.setText(message)
 
-class RAGChatWidget(QWidget):
+class EvaluationChatWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Rag Chat Assistant")
+        self.setWindowTitle("Evaluation Assistant")
         self.setMinimumSize(900, 700)
         self.conversation_history=[]
 
         self.threadpool=QThreadPool()
-        self.selected_files=[]
+        self.selected_pdf_files=[]
+        self.selected_json_file=default_json_path
 
         self.setup_ui()
 
     def setup_ui(self):
         outer_layout=QHBoxLayout()
-
+        self.setLayout(outer_layout)
+        
         main_chat_area_layout=QVBoxLayout()
 
-        file_layout=QHBoxLayout()
-        self.file_button=QPushButton("Select PDF Files")
-        self.file_button.clicked.connect(self.pick_file)
-        file_layout.addWidget(self.file_button)
+        pdf_file_layout=QHBoxLayout()
+        self.pdf_file_button=QPushButton("Select PDF Files")
+        self.pdf_file_button.clicked.connect(self.pick_pdf_files)
+        pdf_file_layout.addWidget(self.pdf_file_button)
+        self.pdf_file_label=QLabel("No PDF Files selected")
+        pdf_file_layout.addWidget(self.pdf_file_label)
+        pdf_file_layout.addStretch(1)
+        main_chat_area_layout.addLayout(pdf_file_layout)
 
-        self.run_button=QPushButton("Run RAG")
-        self.run_button.clicked.connect(self.run_rag)
-        file_layout.addWidget(self.run_button)
+        json_file_layout=QHBoxLayout()
+        self.json_file_button=QPushButton("Select JSON File for Metrics")
+        self.json_file_button.clicked.connect(self.pick_json_file)
+        json_file_layout.addWidget(self.json_file_button)
+        self.json_file_label=QLabel(f"Metrics JSON: {os.path.basename(self.selected_json_file)}")
+        json_file_layout.addWidget(self.json_file_label)
+        json_file_layout.addStretch(1)
+        main_chat_area_layout.addLayout(json_file_layout)
 
-        main_chat_area_layout.addLayout(file_layout)
+        run_eval_layout=QHBoxLayout()
+        self.run_button=QPushButton("Run Evaluation")
+        self.run_button.clicked.connect(self.start_evaluation)
+        run_eval_layout.addWidget(self.run_button)
+        main_chat_area_layout.addLayout(run_eval_layout)
 
         self.chat_scroll=QScrollArea()
         self.chat_scroll.setWidgetResizable(True)
@@ -91,11 +107,11 @@ class RAGChatWidget(QWidget):
         # Input area
         input_layout=QHBoxLayout()
         self.query_input=QLineEdit()
-        self.query_input.setPlaceholderText("Ask a question...")
+        self.query_input.setPlaceholderText("Ask a question about evaluation...")
         input_layout.addWidget(self.query_input)
 
         self.ask_button=QPushButton("Ask")
-        self.ask_button.clicked.connect(self.run_rag)
+        self.ask_button.clicked.connect(self.start_evaluation)
         input_layout.addWidget(self.ask_button)
 
         main_chat_area_layout.addLayout(input_layout)
@@ -116,11 +132,17 @@ class RAGChatWidget(QWidget):
         
         self.setLayout(outer_layout)
 
-    def pick_file(self):
-        files, _=QFileDialog.getOpenFileNames(self, "select Files", "", "PDF Files (*.pdf);;JSON Files (*.json)")
+    def pick_pdf_files(self):
+        files, _=QFileDialog.getOpenFileNames(self, "select Files", "", "PDF Files (*.pdf)")
         if files:
-            self.selected_files=files
-            self.file_button.setText(f"Selected Files: {len(files)}")
+            self.selected_pdf_files=files
+            self.pdf_file_label.setText(f"Selected Files: {len(files)}")
+
+    def pick_json_file(self):
+        file, _=QFileDialog.getOpenFileName(self, "select metric JSON File", "", "JSON Files (*.json)")
+        if file:
+            self.selected_json_file=file
+            self.json_file_label.setText(f"Selected JSON File: {os.path.basename(file)}")
     
     def add_message(self, text, sender):
         bubble=ChatBubble(text, sender)
@@ -142,26 +164,37 @@ class RAGChatWidget(QWidget):
 
     def display_error(self, error):
         self.add_message(f"Error:\n{error}", "assistant")
+        self.reenable_buttons()
 
     def done_processing(self):
         print("RAG processing complete.")
 
-    def run_rag(self):
+    def start_evaluation(self):
         question=self.query_input.text().strip()
         if not question:
-            self.add_message("Please enter a message.", "assistant")
+            self.add_message("Please enter a question about evaluation", "assistant")
             return
 
-        if not self.selected_files:
-            self.add_message("Please select a PDF or a JSON file.", "assistant")
+        if not self.selected_pdf_files:
+            self.add_message("Please select a PDF.", "assistant")
+            return
+        
+        if not self.selected_json_file or not os.path.exists(self.selected_json_file):
+            self.add_message("Please select a valid JSON metrics file.", "assistant")
             return
         
         self.ask_button.setEnabled(False)
         self.run_button.setEnabled(False)
-        self.file_button.setEnabled(False)
+        self.pdf_file_button.setEnabled(False)
+        self.json_file_button.setEnabled(False)
 
         self.add_message(question, "user")
-        worker=RAGWorker(self.selected_files, question, self.conversation_history)
+        worker=EvaluationWorker(
+            filepaths=self.selected_pdf_files,
+            json_filepath=self.selected_json_file, 
+            question=question, 
+            history=self.conversation_history 
+        )
 
         worker.signals.result.connect(self.update_chat)
         worker.signals.error.connect(self.display_error)
@@ -177,7 +210,8 @@ class RAGChatWidget(QWidget):
     def reenable_buttons(self):
         self.ask_button.setEnabled(True)
         self.run_button.setEnabled(True)
-        self.file_button.setEnabled(True)
+        self.pdf_file_button.setEnabled(True)
+        self.json_file_button.setEnabled(True)
         self.done_processing()
 
     def reset_chat(self):

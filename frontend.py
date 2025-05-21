@@ -3,7 +3,10 @@ from PySide6.QtWidgets import(
     QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QGridLayout, QFormLayout, QSpinBox, QHBoxLayout, QStackedWidget
 )
 from PySide6.QtCore import Qt
+
 from rag_gui import RAGChatWidget
+
+from evaluation_gui import EvaluationChatWidget
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -24,15 +27,23 @@ class MainWindow(QWidget):
 
         self.rag_button=QPushButton("RAG Chatbot")
         self.rag_button.clicked.connect(self.show_rag_page)
-
         left_side_panel_layout.addWidget(self.rag_button)
+        
+        self.evaluation_button=QPushButton("Evaluation Assistant")
+        self.evaluation_button.clicked.connect(self.show_evaluation_page)
+        left_side_panel_layout.addWidget(self.evaluation_button)
+        
         left_side_panel_layout.addStretch()
         
         main_layout.addWidget(left_side_panel_widget, 1)
 
         self.stack=QStackedWidget()
+
         self.rag_page=RAGChatWidget()
         self.stack.addWidget(self.rag_page)
+
+        self.evaluation_page=EvaluationChatWidget()
+        self.stack.addWidget(self.evaluation_page)
 
         self.welcome_page=QWidget()
         welcome_layout=QVBoxLayout()
@@ -55,6 +66,9 @@ class MainWindow(QWidget):
 
     def show_rag_page(self):
         self.stack.setCurrentWidget(self.rag_page)
+
+    def show_evaluation_page(self):
+        self.stack.setCurrentWidget(self.evaluation_page)
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
