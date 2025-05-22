@@ -45,7 +45,7 @@
 ---
 ### Notes
 - Keep the `.exe ` and the  `models` folder together for the app to find the model correctly
-- Created with CUDA support on LLAMA-CPP. Recreate executable by cloning repository, disabling cuda, and recompiling .exe with `pyinstaller --onefile --windowed rag_gui.py`
+- Created with CUDA support on LLAMA-CPP. Recreate executable by cloning repository, disabling cuda, and recompiling .exe with `pyinstaller --onefile --add-binary "C:\Users\caio\miniconda3\envs\rag_new_env\Lib\site-packages\llama_cpp\lib;llama_cpp\lib" frontend.py`, changing the binary's path according to your own llama-cpp installation
 ---
 
 ### Additional support with Llama-cpp installations for recreating .exe builds with lack of GPU support
