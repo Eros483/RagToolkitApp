@@ -54,4 +54,5 @@
     2. Activate your conda environment
     3. run `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"`
     4. verify installations with `where cl` and `where cmake`
-    5. proceed with `pip install -r requirements.txt`
+    5. run `pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu`
+    6. proceed with `pip install -r requirements.txt`
