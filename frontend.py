@@ -8,6 +8,8 @@ from rag_gui import RAGChatWidget
 
 from evaluation_gui import EvaluationChatWidget
 
+from summariser_gui import SummarizerWidget
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -32,6 +34,10 @@ class MainWindow(QWidget):
         self.evaluation_button=QPushButton("Evaluation Assistant")
         self.evaluation_button.clicked.connect(self.show_evaluation_page)
         left_side_panel_layout.addWidget(self.evaluation_button)
+
+        self.summarizer_button=QPushButton("Document Summarizer")
+        self.summarizer_button.clicked.connect(self.show_summarizer_page)
+        left_side_panel_layout.addWidget(self.summarizer_button)
         
         left_side_panel_layout.addStretch()
         
@@ -44,6 +50,9 @@ class MainWindow(QWidget):
 
         self.evaluation_page=EvaluationChatWidget()
         self.stack.addWidget(self.evaluation_page)
+
+        self.summarizer_page=SummarizerWidget()
+        self.stack.addWidget(self.summarizer_page)
 
         self.welcome_page=QWidget()
         welcome_layout=QVBoxLayout()
@@ -69,6 +78,9 @@ class MainWindow(QWidget):
 
     def show_evaluation_page(self):
         self.stack.setCurrentWidget(self.evaluation_page)
+
+    def show_summarizer_page(self):
+        self.stack.setCurrentWidget(self.summarizer_page)
 
 if __name__=="__main__":
     app = QApplication(sys.argv)

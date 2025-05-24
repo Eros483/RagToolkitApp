@@ -15,15 +15,15 @@ if getattr(sys, 'frozen', False):
 else:
     # Running as a .py file
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+from model_loader import llm_model
 
-model_path = os.path.join(BASE_DIR, "models", "Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf")
+llm=llm_model
+
 
 json_path=os.path.join(BASE_DIR, "sample_json", "sample1.json")
 
-if not os.path.exists(model_path) or not os.path.exists(json_path):
-    raise ValueError(f"Model path or json path does not exist: {model_path} or {json_path}")
-
-llm=llama_cpp.Llama(model_path=model_path, chat_format="llama-2", n_ctx=8192, n_gpu_layers=-1)
+if not os.path.exists(json_path):
+    raise ValueError(f"Model path or json path does not exist: {json_path}")
 
 index=None
 id_to_text={}
