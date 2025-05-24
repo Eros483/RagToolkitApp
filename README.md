@@ -1,6 +1,6 @@
-# RAG Runner
+# RAG Toolkit
 
-**RAG Runner** is a Retrieval-Augmented Generation (RAG) app that uses a local LLaMA GGUF model. It combines a user-friendly GUI with a backend to fetch context and generate responses, all offline.
+**RAG Toolkit** is a Retrieval-Augmented Generation (RAG) app that uses a local LLaMA GGUF model. It combines a user-friendly GUI with a backend to fetch context and generate responses, all offline.
 
 ---
 
