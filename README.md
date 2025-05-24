@@ -11,7 +11,11 @@
 - Retrieval-augmented generation pipeline
 - Minimal dependencies and setup
 - Suitable for offline and privacy-sensitive use cases
-
+---
+## Current capabilities
+- Chatting with documents
+- Evaluation using a JSON metrics file
+- Summarisation
 ---
 
 ## Getting Started
