@@ -50,13 +50,13 @@ class ChatBubble(QTextBrowser):
         self.setText(message)
 
 class RAGChatWidget(QWidget):
-    def __init__(self):
+    def __init__(self, max_tokens: int=512):
         super().__init__()
 
         self.setWindowTitle("Rag Chat Assistant")
         self.setMinimumSize(800, 600)
         self.conversation_history=[]
-
+        self.max_tokens=max_tokens
         self.threadpool=QThreadPool()
         self.selected_files=[]
 
@@ -149,7 +149,7 @@ class RAGChatWidget(QWidget):
         self.file_button.setEnabled(False)
 
         self.add_message(question, "user")
-        worker=RAGWorker(self.selected_files, question, self.conversation_history)
+        worker=RAGWorker(self.selected_files, question, self.conversation_history, self.max_tokens)
 
         worker.signals.result.connect(self.update_chat)
         worker.signals.error.connect(self.display_error)

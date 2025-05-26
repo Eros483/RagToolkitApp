@@ -51,11 +51,12 @@ class ChatBubble(QTextBrowser):
         self.setText(message)
 
 class EvaluationChatWidget(QWidget):
-    def __init__(self):
+    def __init__(self, max_tokens: int=512):
         super().__init__()
 
         self.setWindowTitle("Evaluation Assistant")
         self.setMinimumSize(800, 600)
+        self.max_tokens=max_tokens
         self.conversation_history=[]
 
         self.threadpool=QThreadPool()
@@ -181,7 +182,8 @@ class EvaluationChatWidget(QWidget):
             filepaths=self.selected_pdf_files,
             json_filepath=self.selected_json_file, 
             question=question, 
-            history=self.conversation_history 
+            history=self.conversation_history ,
+            max_tokens=self.max_tokens
         )
 
         worker.signals.result.connect(self.update_chat)

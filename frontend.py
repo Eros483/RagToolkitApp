@@ -1,8 +1,8 @@
 import sys
 from PySide6.QtWidgets import(
-    QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QGridLayout, QFormLayout, QSpinBox, QHBoxLayout, QStackedWidget
+    QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QGridLayout, QFormLayout, QSpinBox, QHBoxLayout, QStackedWidget, QSlider
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QIcon
 import os
 
@@ -25,6 +25,7 @@ class MainWindow(QWidget):
         self.setWindowTitle("Multi-App Dashboard")
         self.setMinimumSize(1000, 700)
 
+        self.max_tokens_value=512
         self.setup_ui()
 
     def setup_ui(self):
@@ -74,6 +75,43 @@ class MainWindow(QWidget):
         self.summarizer_button.setStyleSheet(button_style)
         self.summarizer_button.clicked.connect(self.show_summarizer_page)
         left_side_panel_layout.addWidget(self.summarizer_button)
+
+        self.max_tokens_label = QLabel(f"Max Tokens: {self.max_tokens_value}")
+        self.max_tokens_label.setStyleSheet("color: #dcdcdc; font-size: 12px; margin-top: 10px;")
+        left_side_panel_layout.addWidget(self.max_tokens_label)
+
+        self.max_tokens_slider=QSlider(Qt.Horizontal)
+        self.max_tokens_slider.setMinimum(100)
+        self.max_tokens_slider.setMaximum(4096)
+        self.max_tokens_slider.setValue(self.max_tokens_value)
+        self.max_tokens_slider.setTickPosition(QSlider.TicksBelow)
+        self.max_tokens_slider.setTickInterval(500)
+        self.max_tokens_slider.setStyleSheet("""
+            QSlider::groove:horizontal {
+                border: 1px solid #444;
+                height: 8px;
+                background: #2a2a2a;
+                margin: 2px 0;
+                border-radius: 4px;
+            }
+            QSlider::handle:horizontal {
+                background: #8FD6E1; /* Updated handle color */
+                border: 1px solid #8FD6E1;
+                width: 18px;
+                margin: -5px 0;
+                border-radius: 9px;
+            }
+            QSlider::add-page:horizontal {
+                background: #555; /* Retained for contrast on the unfilled part */
+                border-radius: 4px;
+            }
+            QSlider::sub-page:horizontal {
+                background: #8FD6E1; /* Updated filled part color */
+                border-radius: 4px;
+            }
+        """)
+        self.max_tokens_slider.valueChanged.connect(self.update_max_tokens)
+        left_side_panel_layout.addWidget(self.max_tokens_slider)
         
         left_side_panel_layout.addStretch()
 
@@ -87,13 +125,13 @@ class MainWindow(QWidget):
 
         self.stack=QStackedWidget()
 
-        self.rag_page=RAGChatWidget()
+        self.rag_page=RAGChatWidget(max_tokens=self.max_tokens_value)
         self.stack.addWidget(self.rag_page)
 
-        self.evaluation_page=EvaluationChatWidget()
+        self.evaluation_page=EvaluationChatWidget(max_tokens=self.max_tokens_value)
         self.stack.addWidget(self.evaluation_page)
 
-        self.summarizer_page=SummarizerWidget()
+        self.summarizer_page=SummarizerWidget(max_tokens=self.max_tokens_value)
         self.stack.addWidget(self.summarizer_page)
 
         self.welcome_page=QWidget()
@@ -115,6 +153,16 @@ class MainWindow(QWidget):
 
         self.stack.setCurrentWidget(self.welcome_page)
         main_layout.addWidget(self.stack, 4)
+
+    def update_max_tokens(self, value):
+        self.max_tokens_value=value
+        self.max_tokens_label.setText(f"Max Tokens: {self.max_tokens_value}")
+
+        self.rag_page.max_tokens = value
+        self.evaluation_page.max_tokens = value
+        self.summarizer_page.max_tokens = value
+
+        print(f"Global max tokens updated to {value}")
 
     def show_rag_page(self):
         self.stack.setCurrentWidget(self.rag_page)

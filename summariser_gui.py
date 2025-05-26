@@ -10,11 +10,12 @@ from PySide6.QtGui import QTextOption
 from summariser_backend import SummarizationWorker
 
 class SummarizerWidget(QWidget):
-    def __init__(self):
+    def __init__(self, max_tokens: int=512):
         super().__init__()
 
         self.setWindowTitle("Document Summarization")
         self.setMinimumSize(800, 600)
+        self.max_tokens=max_tokens
 
         self.threadpool=QThreadPool()
         self.selected_files=[]
@@ -82,7 +83,7 @@ class SummarizerWidget(QWidget):
         self.summary_output.setPlaceholderText("Generating summary....")
         self.summary_output.clear()
 
-        worker=SummarizationWorker(filepaths=self.selected_files)
+        worker=SummarizationWorker(filepaths=self.selected_files, max_tokens=self.max_tokens)
 
         worker.signals.result.connect(self.display_summary)
         worker.signals.error.connect(self.display_error)

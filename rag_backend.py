@@ -100,9 +100,9 @@ def process_files(filepaths: list[str])-> None:
     else:
         raise ValueError('No text extracted')
     
-def ask_model(question: str, history: list[tuple[str, str]])->str:
+def ask_model(question: str, history: list[tuple[str, str]], max_tokens: int)->str:
     '''
-    input: question as a string, and history of previous questions and answers
+    input: question as a string, and history of previous questions and answers, and max tokens to decide output length
     output: answer as a string
     '''
     context="\n\n".join(search_chunks(question))
@@ -158,7 +158,6 @@ def ask_model(question: str, history: list[tuple[str, str]])->str:
     """
 
     temp=0.7
-    max_tokens=512
 
     response=model.create_completion(
         prompt=final_prompt,
@@ -176,11 +175,12 @@ class WorkerSignals(QObject):
     result=Signal(object)
 
 class RAGWorker(QRunnable):
-    def __init__(self, filepaths, question=None, history=None):
+    def __init__(self, filepaths, question=None, history=None, max_tokens: int=512):
         super().__init__()
         self.filepaths=filepaths
         self.question=question
         self.history=history or []
+        self.max_tokens=max_tokens
         self.signals=WorkerSignals()
     
     @Slot()
@@ -188,7 +188,7 @@ class RAGWorker(QRunnable):
         try:
             process_files(self.filepaths)
             if self.question:
-                result=ask_model(self.question, self.history)
+                result=ask_model(self.question, self.history, self.max_tokens)
                 self.history.append((self.question, result))
                 self.signals.result.emit((result, self.history))
         

@@ -138,9 +138,9 @@ def summary_creater(selected_indices, chunks):
 
     return summary_list
 
-def collate_summaries(individual_summaries: list[str])->str:
+def collate_summaries(individual_summaries: list[str], max_tokens: int)->str:
     '''
-    input: list of individual summaries
+    input: list of individual summaries and max_tokens to decide output length
     output: summary as a string
     '''
     summaries="\n".join(individual_summaries)
@@ -167,7 +167,6 @@ def collate_summaries(individual_summaries: list[str])->str:
     """
 
     temp=0.7
-    max_tokens=3000
 
     response=model.create_completion(
         prompt=final_prompt,
@@ -184,10 +183,11 @@ class WorkerSignals(QObject):
     result=Signal(object)
 
 class SummarizationWorker(QRunnable):
-    def __init__(self, filepaths: list[str], num_clusters: int=10):
+    def __init__(self, filepaths: list[str], num_clusters: int=10, max_tokens: int=512):
         super().__init__()
         self.filepaths=filepaths
         self.num_clusters=num_clusters
+        self.max_tokens=max_tokens
         self.signals=WorkerSignals()
     
     @Slot()
@@ -196,7 +196,7 @@ class SummarizationWorker(QRunnable):
             all_chunks, all_vectors=process_files(self.filepaths)
             selected_indices=clustering(all_vectors, self.num_clusters)
             individual_summaries=summary_creater(selected_indices, all_chunks)
-            collated_summary=collate_summaries(individual_summaries)
+            collated_summary=collate_summaries(individual_summaries, self.max_tokens)
             self.signals.result.emit(collated_summary)
         
         except Exception as e:
