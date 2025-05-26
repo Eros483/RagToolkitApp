@@ -14,7 +14,7 @@ class SummarizerWidget(QWidget):
         super().__init__()
 
         self.setWindowTitle("Document Summarization")
-        self.setMinimumSize(900, 700)
+        self.setMinimumSize(800, 600)
 
         self.threadpool=QThreadPool()
         self.selected_files=[]

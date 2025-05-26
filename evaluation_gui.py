@@ -55,7 +55,7 @@ class EvaluationChatWidget(QWidget):
         super().__init__()
 
         self.setWindowTitle("Evaluation Assistant")
-        self.setMinimumSize(900, 700)
+        self.setMinimumSize(800, 600)
         self.conversation_history=[]
 
         self.threadpool=QThreadPool()
@@ -118,18 +118,6 @@ class EvaluationChatWidget(QWidget):
 
         outer_layout.addLayout(main_chat_area_layout, 4)
 
-        right_side_panel_widget=QWidget()
-        right_side_panel_layout=QVBoxLayout(right_side_panel_widget)
-        right_side_panel_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        right_side_panel_widget.setStyleSheet("background-color: #864879;")
-
-        self.reset_button=QPushButton("Reset Chat")
-        self.reset_button.clicked.connect(self.reset_chat)
-        right_side_panel_layout.addWidget(self.reset_button)
-        right_side_panel_layout.addStretch(1)
-        
-        outer_layout.addWidget(right_side_panel_widget, 1)
-        
         self.setLayout(outer_layout)
 
     def pick_pdf_files(self):
@@ -214,18 +202,17 @@ class EvaluationChatWidget(QWidget):
         self.json_file_button.setEnabled(True)
         self.done_processing()
 
-    def reset_chat(self):
+    def reset_chat(self): # Keep this method as it will be called from MainWindow
         while self.chat_layout.count():
             item=self.chat_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-
             elif item.layout():
                 self.clear_layout(item.layout())
 
         self.conversation_history=[]
-
-    def clear_layout(self, layout):
+    
+    def clear_layout(self, layout): # RESTORED: The clear_layout helper function
         if layout is not None:
             while layout.count():
                 item = layout.takeAt(0)
@@ -233,4 +220,3 @@ class EvaluationChatWidget(QWidget):
                     item.widget().deleteLater()
                 elif item.layout():
                     self.clear_layout(item.layout())
-

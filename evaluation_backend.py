@@ -20,7 +20,7 @@ from model_loader import llm_model
 llm=llm_model
 
 
-json_path=os.path.join(BASE_DIR, "sample_json", "sample1.json")
+json_path=os.path.join(BASE_DIR, "metrics", "sample1.json")
 
 if not os.path.exists(json_path):
     raise ValueError(f"Model path or json path does not exist: {json_path}")
