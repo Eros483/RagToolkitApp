@@ -26,8 +26,15 @@ class SummarizerWidget(QWidget):
         main_layout=QVBoxLayout()
         self.setLayout(main_layout)
 
+        button_style="""
+            QPushButton {
+                border-radius: 4px; /* Adjust the value for more or less rounded corners */
+            }
+        """
+
         file_selection_layout=QHBoxLayout()
         self.file_button=QPushButton("Select Document for Summary")
+        self.file_button.setStyleSheet(button_style)
         self.file_button.clicked.connect(self.pick_file)
         file_selection_layout.addWidget(self.file_button)
 
@@ -37,6 +44,7 @@ class SummarizerWidget(QWidget):
 
         self.summarize_button=QPushButton("Generate Summary")
         self.summarize_button.clicked.connect(self.start_summarization)
+        self.summarize_button.setStyleSheet(button_style)
         self.summarize_button.setEnabled(False)
         file_selection_layout.addWidget(self.summarize_button)
         main_layout.addLayout(file_selection_layout)

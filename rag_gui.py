@@ -67,13 +67,21 @@ class RAGChatWidget(QWidget):
 
         main_chat_area_layout=QVBoxLayout()
 
+        button_style="""
+            QPushButton {
+                border-radius: 4px; /* Adjust the value for more or less rounded corners */
+            }
+        """
+
         file_layout=QHBoxLayout()
         self.file_button=QPushButton("Select PDF Files")
         self.file_button.clicked.connect(self.pick_file)
+        self.file_button.setStyleSheet(button_style)
         file_layout.addWidget(self.file_button)
 
         self.run_button=QPushButton("Run RAG")
         self.run_button.clicked.connect(self.run_rag)
+        self.run_button.setStyleSheet(button_style)
         file_layout.addWidget(self.run_button)
 
         main_chat_area_layout.addLayout(file_layout)
@@ -95,6 +103,7 @@ class RAGChatWidget(QWidget):
         input_layout.addWidget(self.query_input)
 
         self.ask_button=QPushButton("Ask")
+        self.ask_button.setStyleSheet(button_style)
         self.ask_button.clicked.connect(self.run_rag)
         input_layout.addWidget(self.ask_button)
 

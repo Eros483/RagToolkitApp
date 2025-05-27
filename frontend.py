@@ -55,6 +55,22 @@ class MainWindow(QWidget):
             }
         """
 
+        reset_button_style = """
+            QPushButton {
+                padding: 6px;
+                font-size: 13px;
+                border: 1px solid #3137fd; /* Border color updated */
+                text-align: center;
+                color: white; /* Text color updated to white */
+                background-color: #3137fd; /* Background color updated */
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #2a30e0; /* Slightly darker blue on hover */
+                border: 1px solid #2a30e0;
+            }
+        """
+
         def icon(file_name):
             return QIcon(os.path.join(BASE_DIR, "assets", file_name))
 
@@ -115,9 +131,9 @@ class MainWindow(QWidget):
         
         left_side_panel_layout.addStretch()
 
-        self.reset_all_button=QPushButton("Reset Current Page")
+        self.reset_all_button=QPushButton("Clear")
         self.reset_all_button.setIcon(icon("reset.png"))
-        self.reset_all_button.setStyleSheet(button_style)
+        self.reset_all_button.setStyleSheet(reset_button_style)
         self.reset_all_button.clicked.connect(self.reset_current_page_chat)
         left_side_panel_layout.addWidget(self.reset_all_button)
         

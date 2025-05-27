@@ -69,11 +69,19 @@ class EvaluationChatWidget(QWidget):
         outer_layout=QHBoxLayout()
         self.setLayout(outer_layout)
         
+        button_style="""
+            QPushButton {
+                border-radius: 4px; /* Adjust the value for more or less rounded corners */
+            }
+        """
+
         main_chat_area_layout=QVBoxLayout()
 
         pdf_file_layout=QHBoxLayout()
         self.pdf_file_button=QPushButton("Select PDF Files")
         self.pdf_file_button.clicked.connect(self.pick_pdf_files)
+        self.pdf_file_button.setStyleSheet(button_style)
+
         pdf_file_layout.addWidget(self.pdf_file_button)
         self.pdf_file_label=QLabel("No PDF Files selected")
         pdf_file_layout.addWidget(self.pdf_file_label)
@@ -81,8 +89,11 @@ class EvaluationChatWidget(QWidget):
         main_chat_area_layout.addLayout(pdf_file_layout)
 
         json_file_layout=QHBoxLayout()
+
         self.json_file_button=QPushButton("Select JSON File for Metrics")
         self.json_file_button.clicked.connect(self.pick_json_file)
+        self.json_file_button.setStyleSheet(button_style)
+
         json_file_layout.addWidget(self.json_file_button)
         self.json_file_label=QLabel(f"Metrics JSON: {os.path.basename(self.selected_json_file)}")
         json_file_layout.addWidget(self.json_file_label)
@@ -92,6 +103,8 @@ class EvaluationChatWidget(QWidget):
         run_eval_layout=QHBoxLayout()
         self.run_button=QPushButton("Run Evaluation")
         self.run_button.clicked.connect(self.start_evaluation)
+        self.run_button.setStyleSheet(button_style)
+
         run_eval_layout.addWidget(self.run_button)
         main_chat_area_layout.addLayout(run_eval_layout)
 
@@ -112,6 +125,7 @@ class EvaluationChatWidget(QWidget):
         input_layout.addWidget(self.query_input)
 
         self.ask_button=QPushButton("Ask")
+        self.ask_button.setStyleSheet(button_style)
         self.ask_button.clicked.connect(self.start_evaluation)
         input_layout.addWidget(self.ask_button)
 
