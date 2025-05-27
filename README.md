@@ -1,6 +1,6 @@
 # RAG Toolkit
 
-**RAG Toolkit** is a Retrieval-Augmented Generation (RAG) app that uses a local LLaMA GGUF model. It combines a user-friendly GUI with a backend to fetch context and generate responses, all offline.
+**RAG Toolkit** is a generative AI Windows application that uses a local LLaMA GGUF model. It cprovides various capabilities combined with a windows .exe interface for quick and easy use.
 
 ---
 
@@ -26,10 +26,8 @@
 - Python 3.10 (if running from source)
 
 ### Running the Executable
-1. Clone the repository
 1. Download the `.exe` from the [Releases](#) section, in the same directory as the clone.
-2. Run ``python download_model.py`` on your terminal from the same directory at which the .exe was installed
-3. Run `rag_gui.exe`.
+3. Run `frontend.exe`.
 ---
 ### Dependencies
 -llama-cpp-python
@@ -48,7 +46,7 @@
 
 ---
 ### Notes
-- Keep the `.exe ` and the  `models` folder together for the app to find the model correctly
+- For the first usage of the .exe, a internet connection is a must to download necessary dependencies. Future use in the same directory does not need internet access.
 - Created with CUDA support on LLAMA-CPP. Recreate executable by cloning repository, disabling cuda, and recompiling .exe with `pyinstaller --onefile --add-binary "C:\Users\caio\miniconda3\envs\rag_new_env\Lib\site-packages\llama_cpp\lib;llama_cpp\lib" frontend.py`, changing the binary's path according to your own llama-cpp installation
 ---
 
