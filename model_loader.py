@@ -1,12 +1,17 @@
 import llama_cpp
 import os
 import sys
+from setup import download_metrics_folder, download_model
+
 
 if getattr(sys, 'frozen', False):
     BASE_DIR = os.path.dirname(sys.executable)
 else:
     # Running as a .py file
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+download_metrics_folder()
+download_model()
 
 model_path = os.path.join(BASE_DIR, "models", "Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf")
 

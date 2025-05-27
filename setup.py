@@ -51,7 +51,3 @@ def download_metrics_folder():
         else:
             print(f"File already exists: {local_path}")
 
-if __name__ == "__main__":
-    download_metrics_folder()
-    download_model()
-    print("\nSetup complete.")
