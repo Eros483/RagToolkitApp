@@ -60,5 +60,6 @@
     6. run `set FORCE_CMAKE=1`
     7. run `set LLAMA_CPP_BUILD_TYPE=cpu`
     8. run `pip install llama-cpp-python --no-cache-dir --verbose`
- For gpu enabled llamacpp, follow similiar steps, ignore step 7, and make sure to check `nvcc --version` and if not add it to path. This necessiates a nvidia CUDA toolkit download
+ 
+- For gpu enabled llamacpp, follow similiar steps, ignore step 7, and make sure to check `nvcc --version` and if not add it to path. This necessiates a nvidia CUDA toolkit download
  
