@@ -5,7 +5,7 @@ a = Analysis(
     ['frontend.py'],
     pathex=[],
     binaries=[('C:/Users/arnab/miniconda3/envs/ragEnv/Lib/site-packages/llama_cpp/lib/llama.dll', 'llama_cpp/lib')],
-    datas=[('assets', 'assets')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

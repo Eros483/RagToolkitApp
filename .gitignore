@@ -7,3 +7,8 @@ Releases/
 # Ignore model files
 models/*.gguf
 *.gguf
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

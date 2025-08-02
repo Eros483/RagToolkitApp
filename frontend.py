@@ -3,7 +3,7 @@ from PySide6.QtWidgets import(
     QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QGridLayout, QFormLayout, QSpinBox, QHBoxLayout, QStackedWidget, QSlider
 )
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap
 import os
 
 from rag_gui import RAGChatWidget
@@ -38,6 +38,14 @@ class MainWindow(QWidget):
         left_side_panel_widget=QWidget()
         left_side_panel_layout=QVBoxLayout(left_side_panel_widget)
         left_side_panel_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        logo_label = QLabel()
+        logo_pixmap = QPixmap(os.path.join(BASE_DIR, "assets", "logo.png"))
+        logo_pixmap = logo_pixmap.scaledToWidth(160, Qt.SmoothTransformation)  # Resize logo to fit panel width
+        logo_label.setPixmap(logo_pixmap)
+        logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        left_side_panel_layout.addWidget(logo_label)
+
         left_side_panel_layout.setContentsMargins(10, 10, 10, 10)
         left_side_panel_layout.setSpacing(10)
         left_side_panel_widget.setFixedWidth(200)
